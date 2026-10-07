@@ -65,7 +65,7 @@ python ml_stories/us10_ward_clusters_kmeans.py
 python ml_stories/us11_lpcd_timeseries_forecast.py
 python ml_stories/us19_complaint_volume.py
 python ml_stories/us21_drought_risk.py
-# ... and other usXX scripts
+# ... and other user scripts
 Database Design
 
 Star schema with 3 fact tables (fact_demand, fact_supply, fact_disruptions) and 7 dimension tables optimized for Power BI DirectQuery.
