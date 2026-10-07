@@ -77,3 +77,5 @@ for feat, val in mean_shap.items():
     print(f"  {feat:<30} {val:.4f}")
 mean_shap.to_frame("mean_abs_shap").to_csv("output/us01_shap_importance.csv")
 print(f"Saved → output/us01_shap_importance.csv")
+naive = mean_absolute_percentage_error(y_test, test["demand_lag_1w"]) * 100
+print(f"Naive last-week MAPE: {naive:.2f}%  vs model {mape:.2f}%")

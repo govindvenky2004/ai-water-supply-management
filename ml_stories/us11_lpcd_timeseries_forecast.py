@@ -110,3 +110,6 @@ if equity_alerts:
     pd.DataFrame(equity_alerts).to_csv("output/us11_equity_alerts.csv", index=False)
     print(f"  ⚠ {len(equity_alerts)} equity alert weeks saved → output/us11_equity_alerts.csv")
 print("Saved → output/us11_lpcd_forecast.csv")
+m = test["demand_lag_1w"].notna().values
+naive = mean_absolute_percentage_error(np.asarray(y_te)[m], test["demand_lag_1w"].values[m]) * 100
+print(f"    naive MAPE={naive:.2f}%")

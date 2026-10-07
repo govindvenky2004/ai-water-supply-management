@@ -1,6 +1,6 @@
 """
 US-09: Classify Ward Deficit Severity (None / Low / Medium / High)
-PATCHED – columns verified against diagnose_columns.py
+PATCHED v2 – split BEFORE SMOTE (test set contains real rows only); columns verified against diagnose_columns.py
 KEY FIXES:
   - fact_supply has: deficit_severity ✓, supply_efficiency_pct ✓,
     nrw_vs_benchmark ✓, is_anomaly ✓, deficit_severity_label ✓
@@ -50,13 +50,13 @@ y  = df[TARGET].astype(int)
 
 print(f"Class distribution:\n{y.value_counts().sort_index()}\n")
 
-# ── SMOTE ─────────────────────────────────────────────────────────────────────
-smote     = SMOTE(random_state=42)
-X_r, y_r  = smote.fit_resample(X, y)
-
-split = int(len(X_r) * 0.8)
-X_tr, X_te = X_r[:split], X_r[split:]
-y_tr, y_te = y_r[:split], y_r[split:]
+# ── Split FIRST (stratified), then SMOTE on the TRAIN set only ────────────────
+from sklearn.model_selection import train_test_split
+X_tr0, X_te, y_tr0, y_te = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
+smote = SMOTE(random_state=42)
+X_tr, y_tr = smote.fit_resample(X_tr0, y_tr0)
+print(f"Train (after SMOTE): {pd.Series(y_tr).value_counts().sort_index().to_dict()} | "
+      f"Test (real rows only): {pd.Series(y_te).value_counts().sort_index().to_dict()}")
 
 classes = np.unique(y_tr)
 weights = compute_class_weight("balanced", classes=classes, y=y_tr)
@@ -72,7 +72,7 @@ f1     = f1_score(y_te, y_pred, average="macro")
 
 print("── US-09 Classification Report ──────────────────────────────────")
 print(classification_report(y_te, y_pred,
-      labels=[1,2,3], target_names=["Low", "Medium", "High"]))
+      labels=[0,1,2,3], target_names=["None", "Low", "Medium", "High"]))
 print(f"  Macro F1: {f1:.4f}")
 
 # ── Score full dataset ────────────────────────────────────────────────────────
